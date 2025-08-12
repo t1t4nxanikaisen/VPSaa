@@ -6,12 +6,15 @@ FROM alpine:3.20
 RUN apk add --no-cache bash curl ca-certificates sudo \
     && update-ca-certificates
 
-# download gotty prebuilt binary (avoids go install / module errors)
+# download gotty prebuilt binary (fixed extraction)
 ARG GOTTY_VERSION
-RUN curl -fSL "https://github.com/yudai/gotty/releases/download/${GOTTY_VERSION}/gotty_linux_amd64.tar.gz" -o /tmp/gotty.tar.gz \
-    && tar -xzf /tmp/gotty.tar.gz -C /usr/local/bin gotty \
-    && chmod +x /usr/local/bin/gotty \
-    && rm -rf /tmp/gotty.tar.gz
+RUN curl -fSL "https://github.com/yudai/gotty/releases/download/${GOTTY_VERSION}/gotty_linux_amd64.tar.gz" \
+    -o /tmp/gotty.tar.gz \
+ && tar -xzf /tmp/gotty.tar.gz -C /tmp \
+ && mv /tmp/gotty /usr/local/bin/gotty \
+ && chmod +x /usr/local/bin/gotty \
+ && rm -rf /tmp/gotty.tar.gz
+
 
 # Create a non-root user and give passwordless sudo (so you can run `sudo` from the web shell)
 ARG GOTTY_USER=gotty
